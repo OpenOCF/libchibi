@@ -399,13 +399,10 @@ if env.GetOption('clean'):
 ######################################################################
 # Check for PThreads support
 ######################################################################
-import iotivityconfig
-from iotivityconfig import *
-
 conf = Configure(env,
         custom_tests =
         {
-            'CheckPThreadsSupport' : iotivityconfig.check_pthreads
+            'CheckPThreadsSupport' : check_pthreads
         } )
 
 # Identify whether we have pthreads support, which is necessary for

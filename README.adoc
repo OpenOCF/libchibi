@@ -2,6 +2,11 @@
 Minimal Iotivity - C kernel
 
 
+== scons
+
+* follow scons conventions more closely, e.g. use site_scons
+* site_scons/site_init.py - convert site_scons/SConscript (originally: build_common/SConscript) into initialization code executed here
+
 === legacy stuff
 
 resource/c_common/platform_features.h can be removed - it defines macros that are only

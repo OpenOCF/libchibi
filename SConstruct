@@ -25,7 +25,7 @@
 import os
 
 # Load common build config
-SConscript('build/SConscript')
+SConscript('site_scons/SConscript')
 
 Import('env')
 
