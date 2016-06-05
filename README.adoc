@@ -1,0 +1,65 @@
+# libiotivity
+Minimal Iotivity - C kernel
+
+
+=== legacy stuff
+
+resource/c_common/platform_features.h can be removed - it defines macros that are only
+used in one place, so we can inline the #ifdef code.
+
+
+=== includes
+
+1.  Unify usage:  always use "include", never just "inc"
+
+
+=== sample code
+
+In the official sources, the csdk samples are written in C++, even
+though the library itself is in C.  So what exactly is the public C API?
+
+
+=== c_common
+
+This directory just contains some compatability stuff:
+
+* ocrandom
+* oic_malloc
+* oic_string
+* oic_time
+* platform_features.h
+
+We can eliminate the directory by just including the files in src/.  We can also
+remove platform_features.h; see below.
+
+=== tinycbor
+
+In the offical source tree, tinycbor goes in extlibs/tinycbor.  The
+user must clone it there.  However, the build process only compiles
+three of the tinycbor files:
+
+cborencoder.c
+cborerrorstrings.c
+cborparser.c
+
+In libiotivity we just include those files (and the headers they use)
+in our source tree.
+
+This also allows us to eliminate a weirdish bit of logic in
+resource/csdk/stack/src/ocpayloadconvert.c:
+
+    #define CborNeedsUpdating  (CborErrorOutOfMemory < CborErrorDataTooLarge)
+       OC_STATIC_ASSERT(!CborNeedsUpdating, "tinycbor needs to be updated to at least 47a78569c0");
+  #endif
+
+where OC_STATIC_ASSERT is defined in
+resource/c_common/platform_features.h based on the STDC_VERSION
+in use.  But since we are including the tinycbor code directly, we
+already know we have the right version, so we do not need this test.
+And since that is the only place OC_STATIC_ASSERT is used, we can also eliminate
+platform_features.h
+
+Then the question is whether a cbor api needs to be publicly exposed.
+The problem is that some of the "services" stuff is outside of csdk;
+in particular, service/resource-directory/include/rd_payload.h uses
+cbor.h, and csdk has RD functionality (rdpayload.h).

@@ -1,0 +1,70 @@
+Import('env')
+import os
+
+env.AppendUnique(CPPPATH = [os.path.join(Dir('.').abspath, './include')])
+
+bld_dir = env.get('BUILD_DIR')
+print "ROUTING BLD DIR: ", bld_dir
+
+if env.get('TARGET_OS') == 'tizen':
+    routing_path = bld_dir
+else:
+    routing_path = bld_dir + 'src/routing'
+
+print "ROUTING PATH: ", routing_path
+
+env.AppendUnique(LIBPATH = [env.get('BUILD_DIR')])
+# env.AppendUnique(LIBPATH = routing_path)
+
+env.AppendUnique(LIBS = ['routingmanager'])
+
+local_env = env.Clone()
+
+print "ROUTING CURDIR: ", Dir('.').abspath
+
+if env.get('ROUTING') == 'GW':
+	local_env.AppendUnique(CPPPATH = [
+				os.path.join(Dir('.').abspath, './../../include/stack'),
+				os.path.join(Dir('.').abspath, './../stack/include'),
+				os.path.join(Dir('.').abspath, './../stack/include/internal'),
+				os.path.join(Dir('.').abspath, './../'),
+				# os.path.join(Dir('.').abspath, './../../oc_logger/include'),
+				os.path.join(Dir('.').abspath, './../../include/connectivity/api'),
+				os.path.join(Dir('.').abspath, './../connectivity/common/include'),
+				os.path.join(Dir('.').abspath, './../security/include')
+			])
+elif env.get('ROUTING') == 'EP':
+	local_env.AppendUnique(CPPPATH = [
+				os.path.join(Dir('.').abspath, './../../include/stack'),
+				os.path.join(Dir('.').abspath, './../stack/include'),
+				os.path.join(Dir('.').abspath, './../stack/include/internal'),
+				os.path.join(Dir('.').abspath, './../'),
+				# os.path.join(Dir('.').abspath, './../../oc_logger/include'),
+				os.path.join(Dir('.').abspath, './../../include/connectivity/api'),
+				os.path.join(Dir('.').abspath, './../connectivity/common/include')
+			])
+
+######################################################################
+# Build flags
+######################################################################
+
+######################################################################
+# Source files and Targets
+######################################################################
+
+if env.get('ROUTING') == 'GW':
+	routing_src = [
+		'./routingutility.c',
+		'./routingmanager.c',
+		'./routingtablemanager.c',
+		'./routingmanagerinterface.c',
+		'./routingmessageparser.c',
+    ]
+elif env.get('ROUTING') == 'EP':
+	routing_src = [
+		'./routingutility.c',
+    ]
+
+routinglib = local_env.StaticLibrary('routingmanager', routing_src)
+local_env.InstallTarget(routinglib, 'routingmanager')
+
