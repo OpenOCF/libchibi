@@ -1,4 +1,4 @@
-# libiotivity
+# libchibi
 Minimal Iotivity - C kernel
 
 
